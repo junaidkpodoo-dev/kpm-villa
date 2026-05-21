@@ -42,6 +42,7 @@ class KpmVilla(models.Model):
 
     def action_view_agreements(self):
         self.ensure_one()
+        print("hii")
         return {
             'type': 'ir.actions.act_window',
             'name': 'Agreements',
