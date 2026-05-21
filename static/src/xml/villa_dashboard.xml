@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="kpm_villa.VillaDashboard">
+        <div class="o_villa_dashboard p-4">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card shadow-sm bg-primary text-white p-3">
+                        <h6>Total Revenue</h6>
+                        <h3><t t-esc="state.stats.total_revenue || 0"/></h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm bg-warning text-white p-3">
+                        <h6>Pending Amount</h6>
+                        <h3><t t-esc="state.stats.pending_amount || 0"/></h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm bg-danger text-white p-3">
+                        <h6>Total Expenses</h6>
+                        <h3><t t-esc="state.stats.total_expenses || 0"/></h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm bg-success text-white p-3">
+                        <h6>Net Profit</h6>
+                        <h3><t t-esc="state.stats.net_profit || 0"/></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card shadow-sm p-3">
+                        <h5>Occupancy</h5>
+                        <div class="d-flex justify-content-around">
+                            <div>
+                                <span class="badge bg-success">Occupied: <t t-esc="state.stats.occupied_villas || 0"/></span>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary">Available: <t t-esc="state.stats.available_villas || 0"/></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

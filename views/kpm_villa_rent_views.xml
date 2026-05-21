@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpm_villa_rent_tree" model="ir.ui.view">
+        <field name="name">kpm.villa.rent.tree</field>
+        <field name="model">kpm.villa.rent</field>
+        <field name="arch" type="xml">
+            <list string="Rent Agreements">
+                <field name="name"/>
+                <field name="partner_id" widget="many2one_avatar"/>
+                <field name="villa_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="monthly_rent"/>
+                <field name="state" widget="badge" decoration-success="state == 'running'" decoration-info="state == 'draft'" decoration-danger="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_kpm_villa_rent_form" model="ir.ui.view">
+        <field name="name">kpm.villa.rent.form</field>
+        <field name="model">kpm.villa.rent</field>
+        <field name="arch" type="xml">
+            <form string="Rent Agreement">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_close" string="Close Agreement" type="object" invisible="state != 'running'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,running,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-money" type="object" name="action_show_payments">
+                             <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="total_paid"/></span>
+                                <span class="o_stat_text">Paid</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-exclamation-triangle" type="object" name="action_show_pending">
+                             <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="pending_amount"/></span>
+                                <span class="o_stat_text">Pending</span>
+                            </div>
+                        </button>
+                         <button class="oe_stat_button" icon="fa-tint" type="object" name="action_show_water">
+                             <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="water_bill_total"/></span>
+                                <span class="o_stat_text">Water Bill</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-wrench" type="object" name="action_show_expenses">
+                             <div class="o_stat_info">
+                                <span class="o_stat_value"><field name="expense_total"/></span>
+                                <span class="o_stat_text">Expenses</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" widget="many2one_avatar"/>
+                            <field name="villa_id"/>
+                            <field name="monthly_rent"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="advance_amount"/>
+                            <field name="security_deposit"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payments">
+                            <field name="payment_line_ids">
+                                <list editable="bottom">
+                                    <field name="payment_date"/>
+                                    <field name="month"/>
+                                    <field name="rent_amount"/>
+                                    <field name="paid_amount" sum="Total"/>
+                                    <field name="pending_amount" sum="Total"/>
+                                    <field name="payment_method"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
+                         <page string="Water Bills">
+                            <field name="water_bill_line_ids" readonly="1">
+                                <list>
+                                    <field name="water_bill_id"/>
+                                    <field name="amount" string="Total Amount"/>
+                                    <field name="paid_amount" sum="Total"/>
+                                    <field name="due_amount" sum="Total"/>
+                                    <button name="action_open_payment_wizard" type="object" string="Pay" icon="fa-money" invisible="due_amount &lt;= 0"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_kpm_villa_rent" model="ir.actions.act_window">
+        <field name="name">Agreements</field>
+        <field name="res_model">kpm.villa.rent</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

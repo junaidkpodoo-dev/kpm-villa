@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_rent_agreement" model="ir.actions.report">
+        <field name="name">Rent Agreement</field>
+        <field name="model">kpm.villa.rent</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">kpm_villa.report_rent_agreement</field>
+        <field name="report_file">kpm_villa.report_rent_agreement</field>
+        <field name="binding_model_id" ref="model_kpm_villa_rent"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

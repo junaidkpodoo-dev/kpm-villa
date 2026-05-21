@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_kpm_villa_root" name="Villa Management" web_icon="kpm_villa,static/description/icon.png" sequence="10"/>
+
+    <menuitem id="menu_kpm_villa" name="Villas" parent="menu_kpm_villa_root" action="action_kpm_villa" sequence="10"/>
+    <menuitem id="menu_kpm_villa_rent" name="Agreements" parent="menu_kpm_villa_root" action="action_kpm_villa_rent" sequence="20"/>
+    <menuitem id="menu_kpm_villa_water_bill" name="Water Bills" parent="menu_kpm_villa_root" action="action_kpm_villa_water_bill" sequence="30"/>
+    <menuitem id="menu_kpm_villa_expense" name="Expenses" parent="menu_kpm_villa_root" action="action_kpm_villa_expense" sequence="40"/>
+</odoo>

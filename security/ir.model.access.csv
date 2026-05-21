@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_kpm_villa,kpm.villa,model_kpm_villa,base.group_user,1,1,1,1
+access_kpm_villa_rent,kpm.villa.rent,model_kpm_villa_rent,base.group_user,1,1,1,1
+access_kpm_villa_payment,kpm.villa.payment,model_kpm_villa_payment,base.group_user,1,1,1,1
+access_kpm_villa_water_bill,kpm.villa.water.bill,model_kpm_villa_water_bill,base.group_user,1,1,1,1
+access_kpm_villa_water_bill_line,kpm.villa.water.bill.line,model_kpm_villa_water_bill_line,base.group_user,1,1,1,1
+access_kpm_villa_expense,kpm.villa.expense,model_kpm_villa_expense,base.group_user,1,1,1,1
+access_kpm_villa_water_bill_payment_wizard,kpm.villa.water.bill.payment.wizard,model_kpm_villa_water_bill_payment_wizard,base.group_user,1,1,1,1

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpm_villa_water_bill_tree" model="ir.ui.view">
+        <field name="name">kpm.villa.water.bill.tree</field>
+        <field name="model">kpm.villa.water.bill</field>
+        <field name="arch" type="xml">
+            <list string="Water Bills">
+                <field name="name"/>
+                <field name="bill_date"/>
+                <field name="total_amount"/>
+                <field name="split_method"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_kpm_villa_water_bill_form" model="ir.ui.view">
+        <field name="name">kpm.villa.water.bill.form</field>
+        <field name="model" >kpm.villa.water.bill</field>
+        <field name="arch" type="xml">
+            <form string="Water Bill Split">
+                <header>
+                    <button name="action_split_bill" string="Split" type="object" class="btn-primary" invisible="split_method != 'equal'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Bill Reference"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bill_date"/>
+                            <field name="split_method"/>
+                        </group>
+                        <group>
+                            <field name="total_amount"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Split Lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="villa_id"/>
+                                    <field name="rent_id"/>
+                                    <field name="amount"/>
+                                    <field name="paid_amount" readonly="1"/>
+                                    <field name="due_amount" readonly="1"/>
+                                    <button name="action_open_payment_wizard" type="object" string="Pay" icon="fa-money" invisible="due_amount &lt;= 0"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="view_kpm_villa_water_bill_payment_wizard_form" model="ir.ui.view">
+        <field name="name">kpm.villa.water.bill.payment.wizard.form</field>
+        <field name="model">kpm.villa.water.bill.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Pay Water Bill">
+                <group>
+                    <field name="line_id"/>
+                    <field name="payment_amount"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_payment" string="Pay" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_kpm_villa_water_bill" model="ir.actions.act_window">
+        <field name="name">Water Bills</field>
+        <field name="res_model">kpm.villa.water.bill</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

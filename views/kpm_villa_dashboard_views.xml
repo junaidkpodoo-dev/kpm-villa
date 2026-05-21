@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_villa_revenue_dashboard" model="ir.actions.client">
+        <field name="name">Villa Revenue Dashboard</field>
+        <field name="tag">villa_dashboard_tag</field>
+    </record>
+
+<!--    <menuitem id="menu_villa_dashboard" name="Dashboard" parent="menu_kpm_villa_root" action="action_villa_revenue_dashboard" sequence="1"/>-->
+</odoo>
