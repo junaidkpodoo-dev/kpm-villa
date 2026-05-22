@@ -1,6 +1,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
+
 class KpmVillaRent(models.Model):
     _name = 'kpm.villa.rent'
     _description = 'Rent Agreement'
@@ -8,10 +9,11 @@ class KpmVillaRent(models.Model):
 
     name = fields.Char(string='Reference', required=True, copy=False, readonly=True, default=lambda self: _('New'))
     partner_id = fields.Many2one('res.partner', string='Tenant', required=True, tracking=True)
-    villa_id = fields.Many2one('kpm.villa', string='Villa', required=True, tracking=True)
+    villa_id = fields.Many2one('kpm.villa', string='Villa', required=True, tracking=True,
+                               domain=[('status', '=', 'available')])
     start_date = fields.Date(string='Start Date', required=True, default=fields.Date.context_today)
-    end_date = fields.Date(string='End Date', required=True)
-    monthly_rent = fields.Float(string='Monthly Rent', required=True)
+    end_date = fields.Date(string='End Date')
+    monthly_rent = fields.Float(string='Monthly Rent', required=True, tracking=True)
     advance_amount = fields.Float(string='Advance Amount')
     security_deposit = fields.Float(string='Security Deposit')
     notes = fields.Text(string='Notes')
@@ -29,6 +31,12 @@ class KpmVillaRent(models.Model):
     pending_amount = fields.Float(compute='_compute_totals', string='Pending Amount')
     water_bill_total = fields.Float(compute='_compute_totals', string='Water Bill Total')
     expense_total = fields.Float(compute='_compute_totals', string='Expense Total')
+    contact_nos = fields.Char("Mobile Number", related='partner_id.mobile', readonly=False)
+    person_ids = fields.One2many(
+        'kpm.villa.rent.person',
+        'rent_id',
+        string='Occupants / Persons'
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -115,3 +123,23 @@ class KpmVillaRent(models.Model):
             'domain': [('villa_id', '=', self.villa_id.id)],
             'context': {'default_villa_id': self.villa_id.id},
         }
+
+
+class KpmVillaRentPerson(models.Model):
+    _name = 'kpm.villa.rent.person'
+    _description = 'Rent Agreement Occupant'
+
+    # Inverse field to link back to the parent rent agreement
+    rent_id = fields.Many2one('kpm.villa.rent', string='Rent Agreement', ondelete='cascade', required=True)
+
+    name = fields.Char(string='Person Name', required=True)
+    mobile = fields.Char(string='Mobile Number')
+
+    # Many2many field to upload and attach documents using Odoo's native attachments
+    document_ids = fields.Many2many(
+        'ir.attachment',
+        'kpm_rent_person_attachment_rel',  # Custom relation table name
+        'person_id',
+        'attachment_id',
+        string='Documents'
+    )

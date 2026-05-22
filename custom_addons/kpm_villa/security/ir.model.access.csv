@@ -6,3 +6,4 @@ access_kpm_villa_water_bill,kpm.villa.water.bill,model_kpm_villa_water_bill,base
 access_kpm_villa_water_bill_line,kpm.villa.water.bill.line,model_kpm_villa_water_bill_line,base.group_user,1,1,1,1
 access_kpm_villa_expense,kpm.villa.expense,model_kpm_villa_expense,base.group_user,1,1,1,1
 access_kpm_villa_water_bill_payment_wizard,kpm.villa.water.bill.payment.wizard,model_kpm_villa_water_bill_payment_wizard,base.group_user,1,1,1,1
+access_kpm_villa_rent_person,access.kpm.villa.rent.person,model_kpm_villa_rent_person,base.group_user,1,1,1,1

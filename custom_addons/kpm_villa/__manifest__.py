@@ -17,7 +17,7 @@ KPM Villa Management System
     """,
     'author': 'KPM',
     'website': 'https://kpm.com',
-    'depends': ['base', 'mail', 'website'],
+    'depends': ['base', 'mail', 'website', 'account'],
     'data': [
         'security/ir.model.access.csv',
         'data/sequences.xml',
@@ -32,6 +32,7 @@ KPM Villa Management System
         'views/website_templates.xml',
         'views/website_edit_templates.xml',
         'views/website_list_templates.xml',
+        'views/res_partner_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

@@ -34,9 +34,43 @@ class VillaWebsite(http.Controller):
     def mobile_dashboard(self, **kwargs):
         stats = self._get_dashboard_stats()
         agreements = request.env['kpm.villa.rent'].search([], limit=5, order='create_date desc')
+        pending_rent_lines = request.env['kpm.villa.payment'].search([
+            ('pending_amount', '>', 0)
+        ], limit=8, order='payment_date desc, id desc')
+        pending_water_lines = request.env['kpm.villa.water.bill.line'].search([
+            ('due_amount', '>', 0)
+        ], limit=8, order='id desc')
+        pending_details = []
+
+        for payment in pending_rent_lines:
+            pending_details.append({
+                'partner_name': payment.rent_id.partner_id.name,
+                'villa_name': payment.rent_id.villa_id.name,
+                'type': 'Rent',
+                'amount': payment.pending_amount,
+                'date': payment.payment_date,
+                'href': '/villa/mobile/agreement/%s' % payment.rent_id.id,
+            })
+
+        for water_line in pending_water_lines:
+            pending_details.append({
+                'partner_name': water_line.rent_id.partner_id.name,
+                'villa_name': water_line.villa_id.name,
+                'type': 'Water',
+                'amount': water_line.due_amount,
+                'date': water_line.water_bill_id.bill_date,
+                'href': '/villa/mobile/agreement/%s' % water_line.rent_id.id,
+            })
+
+        pending_details = sorted(
+            pending_details,
+            key=lambda line: line['date'] or datetime.date.min,
+            reverse=True
+        )[:8]
         return request.render("kpm_villa.villa_mobile_dashboard", {
             'stats': stats,
             'agreements': agreements,
+            'pending_details': pending_details,
         })
 
     # --- Rooms ---

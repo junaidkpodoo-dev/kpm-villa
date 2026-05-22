@@ -12,7 +12,7 @@ class KpmVillaPayment(models.Model):
         ('05', 'May'), ('06', 'June'), ('07', 'July'), ('08', 'August'),
         ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')
     ], string='Month', required=True)
-    rent_amount = fields.Float(string='Rent Amount', required=True)
+    rent_amount = fields.Float(string='Rent Amount')
     paid_amount = fields.Float(string='Paid Amount', required=True)
     pending_amount = fields.Float(string='Pending Amount', compute='_compute_pending_amount', store=True)
     payment_method = fields.Selection([

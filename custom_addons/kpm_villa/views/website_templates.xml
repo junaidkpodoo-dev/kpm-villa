@@ -43,111 +43,286 @@
     <!-- Mobile Dashboard -->
     <template id="villa_mobile_dashboard" name="Mobile Dashboard">
         <t t-call="kpm_villa.villa_mobile_layout">
-            <div class="app-header">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="app-header villa-dashboard-header">
+
+                <style>
+                    .villa-dashboard-header {
+                    background: linear-gradient(145deg, #191512 0%, #2a211b 58%, #3a2b1f 100%);
+                    border-radius: 0 0 28px 28px;
+                    padding: 26px 20px 34px;
+                    min-height: 178px;
+                    color: #fff8ed;
+                    box-shadow: 0 18px 34px rgba(34, 24, 17, .22);
+                    }
+
+                    .dashboard-kicker {
+                    color: #c9a86a;
+                    font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0;
+                    text-transform: uppercase;
+                    }
+
+                    .dashboard-title {
+                    color: #fff8ed;
+                    font-size: 28px;
+                    line-height: 1.1;
+                    }
+
+                    .dashboard-subtitle {
+                    color: rgba(255,248,237,.68);
+                    font-size: 13px;
+                    }
+
+                    .header-icon {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+                    background: rgba(201,168,106,.16);
+                    border: 1px solid rgba(201,168,106,.28);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #f3d79d;
+                    }
+
+                    .villa-stat-link {
+                    color: inherit;
+                    display: block;
+                    text-decoration: none;
+                    }
+
+                    .villa-stat-button {
+                    background: transparent;
+                    border: 0;
+                    padding: 0;
+                    text-align: left;
+                    width: 100%;
+                    }
+
+                    .villa-stat-card {
+                    border: 1px solid rgba(77, 58, 37, .11);
+                    box-shadow: 0 12px 28px rgba(42, 33, 27, .08);
+                    }
+
+                    .villa-stat-icon {
+                    background: #f6efe3;
+                    color: #8b642b;
+                    }
+
+                    .villa-stat-value {
+                    color: #2a211b;
+                    }
+
+                    .villa-pending-value {
+                    color: #9f3f2f;
+                    }
+
+                    .villa-water-value {
+                    color: #8b642b;
+                    }
+
+                    .pending-detail-card {
+                    border-left: 3px solid #c9a86a;
+                    }
+
+                    .pending-type-pill {
+                    background: #f6efe3;
+                    color: #6f5126;
+                    border-radius: 999px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    padding: 4px 9px;
+                    }
+
+                    .villa-accent-link {
+                    color: #8b642b;
+                    }
+
+                    .villa-agreement-icon {
+                    background: #f6efe3;
+                    color: #8b642b;
+                    }
+                </style>
+
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h4 class="mb-0 fw-bold">KPM Villa</h4>
-                        <p class="opacity-75 small mb-0">Management Overview</p>
+                        <div class="dashboard-kicker mb-2">KPM Villa</div>
+                        <h2 class="dashboard-title mb-2 fw-bold">Dashboard</h2>
+                        <p class="dashboard-subtitle mb-0">Rooms, dues, and active agreements</p>
                     </div>
-                    <div class="rounded-circle bg-white bg-opacity-25 p-2 text-white border border-white border-opacity-25">
+
+                    <div class="header-icon">
                         <i class="fa fa-bell-o"/>
                     </div>
                 </div>
+
             </div>
 
             <div class="container pb-5">
                 <!-- Main KPI Card -->
-                <div class="mobile-card bg-primary text-white border-0 shadow-lg animate-up"
-                     style="background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);">
-                    <div class="row align-items-center">
-                        <div class="col-7">
-                            <span class="small opacity-75">Net Profit</span>
-                            <h2 class="fw-bold mb-0">
-                                <t t-esc="stats['net_profit']"
-                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
-                            </h2>
-                        </div>
-                        <div class="col-5 text-end">
-                            <div class="d-inline-block p-3 rounded-circle bg-white bg-opacity-20">
-                                <i class="fa fa-line-chart fa-2x"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 pt-3 border-top border-white border-opacity-10 d-flex justify-content-between">
-                        <div>
-                            <p class="small mb-0 opacity-75">Revenue</p>
-                            <p class="fw-bold mb-0">
-                                <t t-esc="stats['total_revenue']"
-                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
-                            </p>
-                        </div>
-                        <div class="text-end">
-                            <p class="small mb-0 opacity-75">Expenses</p>
-                            <p class="fw-bold mb-0 text-danger-light">-
-                                <t t-esc="stats['total_expenses']"
-                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <!--                <div class="mobile-card bg-primary text-white border-0 shadow-lg animate-up"-->
+                <!--                     style="background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);">-->
+                <!--                    <div class="row align-items-center">-->
+                <!--                        <div class="col-7">-->
+                <!--                            <span class="small opacity-75">Net Profit</span>-->
+                <!--                            <h2 class="fw-bold mb-0">-->
+                <!--                                <t t-esc="stats['net_profit']"-->
+                <!--                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>-->
+                <!--                            </h2>-->
+                <!--                        </div>-->
+                <!--                        <div class="col-5 text-end">-->
+                <!--                            <div class="d-inline-block p-3 rounded-circle bg-white bg-opacity-20">-->
+                <!--                                <i class="fa fa-line-chart fa-2x"/>-->
+                <!--                            </div>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div class="mt-4 pt-3 border-top border-white border-opacity-10 d-flex justify-content-between">-->
+                <!--                        <div>-->
+                <!--                            <p class="small mb-0 opacity-75">Revenue</p>-->
+                <!--                            <p class="fw-bold mb-0">-->
+                <!--                                <t t-esc="stats['total_revenue']"-->
+                <!--                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>-->
+                <!--                            </p>-->
+                <!--                        </div>-->
+                <!--                        <div class="text-end">-->
+                <!--                            <p class="small mb-0 opacity-75">Expenses</p>-->
+                <!--                            <p class="fw-bold mb-0 text-danger-light">- -->
+                <!--                                <t t-esc="stats['total_expenses']"-->
+                <!--                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>-->
+                <!--                            </p>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
                 <!-- Secondary Stats -->
                 <div class="row g-3 mb-4 animate-up" style="animation-delay: 0.1s;">
                     <div class="col-6">
-                        <div class="mobile-card h-100 mb-0">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="p-2 rounded-circle bg-info-light text-info me-2">
-                                    <i class="fa fa-home"/>
+                        <a href="/villa/mobile/rooms" class="villa-stat-link h-100">
+                            <div class="mobile-card villa-stat-card h-100 mb-0">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="p-2 rounded-circle villa-stat-icon me-2">
+                                        <i class="fa fa-home"/>
+                                    </div>
+                                    <span class="card-label mb-0">Occupancy</span>
                                 </div>
-                                <span class="card-label mb-0">Occupancy</span>
+                                <div class="card-value villa-stat-value">
+                                    <t t-esc="stats['occupied_villas']"/>
+                                    /
+                                    <t t-esc="stats['occupied_villas'] + stats['available_villas']"/>
+                                </div>
                             </div>
-                            <div class="card-value text-info">
-                                <t t-esc="stats['occupied_villas']"/>
-                                /
-                                <t t-esc="stats['occupied_villas'] + stats['available_villas']"/>
-                            </div>
-                        </div>
+                        </a>
                     </div>
                     <div class="col-6">
-                        <div class="mobile-card h-100 mb-0">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="p-2 rounded-circle bg-danger-light text-danger me-2">
-                                    <i class="fa fa-clock-o"/>
+                        <button type="button" id="pendingToggle" class="villa-stat-link villa-stat-button h-100" aria-expanded="false" aria-controls="pendingDetails">
+                            <div class="mobile-card villa-stat-card h-100 mb-0">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="p-2 rounded-circle villa-stat-icon me-2">
+                                        <i class="fa fa-clock-o"/>
+                                    </div>
+                                    <span class="card-label mb-0">Pending</span>
                                 </div>
-                                <span class="card-label mb-0">Pending</span>
-                            </div>
-                            <div class="card-value text-danger">
-                                <t t-esc="stats['pending_amount']"
-                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
-                            </div>
-                            <div class="mt-2 pt-2 border-top border-light">
-                                <div class="d-flex justify-content-between smaller">
-                                    <span class="text-muted">Rent</span>
-                                    <span class="fw-bold text-danger"><t t-esc="stats['pending_rent']" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></span>
+                                <div class="card-value villa-pending-value">
+                                    <t t-esc="stats['pending_amount']"
+                                       t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
                                 </div>
-                                <div class="d-flex justify-content-between smaller">
-                                    <span class="text-muted">Water</span>
-                                    <span class="fw-bold text-info"><t t-esc="stats['pending_water']" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></span>
+                                <div class="mt-2 pt-2 border-top border-light">
+                                    <div class="d-flex justify-content-between smaller">
+                                        <span class="text-muted">Rent</span>
+                                        <span class="fw-bold villa-pending-value">
+                                            <t t-esc="stats['pending_rent']"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between smaller">
+                                        <span class="text-muted">Water</span>
+                                        <span class="fw-bold villa-water-value">
+                                            <t t-esc="stats['pending_water']"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </div>
+
+                <div id="pendingDetails" style="display: none;">
+                    <div class="section-title d-flex justify-content-between align-items-center mb-3 animate-up"
+                         style="animation-delay: 0.15s;">
+                        <h6 class="mb-0 fw-bold">Pending Details</h6>
+                        <span class="small text-muted">Rent &amp; water</span>
+                    </div>
+
+                    <t t-if="pending_details">
+                        <t t-foreach="pending_details" t-as="line">
+                            <a t-att-href="line['href']" class="mobile-card pending-detail-card animate-up d-block text-decoration-none text-dark"
+                               style="animation-delay: 0.18s;">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="pending-type-pill">
+                                            <t t-esc="line['type']"/>
+                                        </span>
+                                        <span class="small text-muted">
+                                            <t t-esc="line['villa_name']"/>
+                                        </span>
+                                    </div>
+                                    <h6 class="fw-bold mb-1">
+                                        <t t-esc="line['partner_name']"/>
+                                    </h6>
+                                    <p class="small text-muted mb-0">
+                                        <t t-esc="line['date']"/>
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold villa-pending-value">
+                                        <t t-esc="line['amount']"
+                                           t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                    </div>
+                                    <i class="fa fa-chevron-right small text-muted mt-2"/>
+                                </div>
+                            </div>
+                            </a>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <div class="mobile-card text-center text-muted animate-up" style="animation-delay: 0.18s;">
+                            No pending dues.
+                        </div>
+                    </t>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                    var toggle = document.getElementById('pendingToggle');
+                    var details = document.getElementById('pendingDetails');
+                    if (!toggle || !details) { return; }
+                    toggle.addEventListener('click', function () {
+                    var isOpen = details.style.display !== 'none';
+                    details.style.display = isOpen ? 'none' : 'block';
+                    toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+                    if (!isOpen) { details.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+                    });
+                    });
+                </script>
 
                 <!-- Recent Agreements Section -->
                 <div class="section-title d-flex justify-content-between align-items-center mb-3 animate-up"
                      style="animation-delay: 0.2s;">
                     <h6 class="mb-0 fw-bold">Recent Agreements</h6>
-                    <a href="/villa/mobile/agreements" class="small text-primary text-decoration-none fw-bold">View
+                    <a href="/villa/mobile/agreements" class="small villa-accent-link text-decoration-none fw-bold">View
                         All
                     </a>
                 </div>
 
                 <t t-foreach="agreements" t-as="agreement">
-                    <div class="mobile-card animate-up" style="animation-delay: 0.3s;">
+                    <a t-att-href="'/villa/mobile/agreement/%s' % agreement.id"
+                       class="mobile-card animate-up d-block text-decoration-none text-dark" style="animation-delay: 0.3s;">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="d-flex align-items-center">
-                                <div class="bg-light p-3 rounded-4 me-3 text-primary">
+                                <div class="villa-agreement-icon p-3 rounded-4 me-3">
                                     <i class="fa fa-building-o fa-lg"/>
                                 </div>
                                 <div>
@@ -177,13 +352,12 @@
                                 </span>
                             </div>
                             <div class="col-4 text-end">
-                                <a t-att-href="'/villa/mobile/agreement/%s' % agreement.id"
-                                   class="btn btn-link p-0 text-primary fw-bold small text-decoration-none">Details
+                                <span class="villa-accent-link fw-bold small">Details
                                     <i class="fa fa-chevron-right ms-1 small"/>
-                                </a>
+                                </span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </t>
             </div>
 
@@ -357,7 +531,8 @@
                                             <!-- Paid Amount -->
                                             <span class="small fw-bold text-dark">
                                                 Paid:
-                                                <t t-esc="pay.paid_amount" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                <t t-esc="pay.paid_amount"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
                                             </span>
 
                                             <!-- Payment Date -->
@@ -379,7 +554,8 @@
 
                                                 <span class="smaller fw-bold text-danger">
                                                     Due:
-                                                    <t t-esc="pay.pending_amount" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    <t t-esc="pay.pending_amount"
+                                                       t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
                                                 </span>
 
                                                 <!-- Add Button -->
@@ -570,25 +746,32 @@
             <div class="modal fade" id="addWaterPaymentModal" tabindex="-1" aria-labelledby="addWaterPaymentModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm mx-3 mx-sm-auto">
-                    <div class="modal-content border-0 overflow-hidden" style="border-radius: 28px; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);">
+                    <div class="modal-content border-0 overflow-hidden"
+                         style="border-radius: 28px; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);">
                         <form t-att-action="'/villa/mobile/agreement/%s/water/payment/save' % agreement.id"
                               method="post">
                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <input type="hidden" name="water_line_id" id="water_line_id"/>
-                            <div class="modal-header border-0 text-white align-items-start" style="background: linear-gradient(135deg, var(--app-info) 0%, #38bdf8 100%); padding: 22px 22px 18px;">
+                            <div class="modal-header border-0 text-white align-items-start"
+                                 style="background: linear-gradient(135deg, var(--app-info) 0%, #38bdf8 100%); padding: 22px 22px 18px;">
                                 <div class="d-flex align-items-center">
-                                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center me-3" style="width:44px;height:44px;">
+                                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center me-3"
+                                         style="width:44px;height:44px;">
                                         <i class="fa fa-tint"/>
                                     </div>
                                     <div>
-                                        <h5 class="modal-title fw-bold mb-0" id="addWaterPaymentModalLabel">Pay Water Bill</h5>
+                                        <h5 class="modal-title fw-bold mb-0" id="addWaterPaymentModalLabel">Pay Water
+                                            Bill
+                                        </h5>
                                         <span class="small opacity-75">Record a partial or full payment</span>
                                     </div>
                                 </div>
-                                <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"/>
+                                <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal"
+                                        aria-label="Close"/>
                             </div>
                             <div class="modal-body p-4">
-                                <div class="rounded-4 p-3 mb-3" style="background: rgba(14, 165, 233, 0.10); border: 1px solid rgba(14, 165, 233, 0.14);">
+                                <div class="rounded-4 p-3 mb-3"
+                                     style="background: rgba(14, 165, 233, 0.10); border: 1px solid rgba(14, 165, 233, 0.14);">
                                     <span class="card-label d-block mb-1">Selected Bill</span>
                                     <p class="fw-bold text-info mb-0" id="water_payment_note"></p>
                                 </div>
@@ -605,8 +788,13 @@
                                 </div>
                             </div>
                             <div class="modal-footer border-0 pt-0 px-4 pb-4 d-grid gap-2">
-                                <button type="submit" class="btn btn-info rounded-pill py-3 fw-bold text-white border-0" style="background: linear-gradient(135deg, var(--app-info) 0%, #38bdf8 100%);">Save Payment</button>
-                                <button type="button" class="btn btn-light rounded-pill py-2" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-info rounded-pill py-3 fw-bold text-white border-0"
+                                        style="background: linear-gradient(135deg, var(--app-info) 0%, #38bdf8 100%);">
+                                    Save Payment
+                                </button>
+                                <button type="button" class="btn btn-light rounded-pill py-2" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
                             </div>
                         </form>
                     </div>

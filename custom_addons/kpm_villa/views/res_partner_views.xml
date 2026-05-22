@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_partner_form_inherit_documents" model="ir.ui.view">
+            <field name="name">res.partner.form.documents</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+
+                    <page string="Documents &amp; Attachments" name="partner_documents">
+                        <group string="Uploaded Documents">
+
+                            <field name="partner_document_ids"
+                                   widget="many2many_binary"
+                                   string="Attach Files"
+                                   nolabel="1"/>
+
+                        </group>
+                    </page>
+
+                </xpath>
+
+                <!-- Make Mobile Required -->
+                <xpath expr="//field[@name='mobile']" position="attributes">
+                    <attribute name="required">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='phone']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='website']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <!-- Make Image Required -->
+                <xpath expr="//field[@name='image_1920']" position="attributes">
+                    <attribute name="required">1</attribute>
+                </xpath>
+
+                <!-- Add Aadhaar Number -->
+                <xpath expr="//field[@name='category_id']" position="before">
+<!--                    <div>-->
+<!--                       <label for="aadhaar_number"/>-->
+                        <field name="aadhaar_number"
+                               string="Aadhaar"
+                               required="1"/>
+<!--                    </div>-->
+                </xpath>
+
+                <!-- Hide Sales & Purchase -->
+                <xpath expr="//page[@name='sales_purchases']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <!-- Hide Invoicing -->
+                <xpath expr="//page[@name='accounting']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+
+        </record>
+
+    </data>
+</odoo>
