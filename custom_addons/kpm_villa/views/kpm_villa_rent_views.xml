@@ -55,6 +55,15 @@
                                 <span class="o_stat_text">Water Bill</span>
                             </div>
                         </button>
+                        <button class="oe_stat_button" icon="fa-plus-circle" type="object"
+                                name="action_show_other_payments">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="other_payment_due_total"/>
+                                </span>
+                                <span class="o_stat_text">Other Due</span>
+                            </div>
+                        </button>
                         <button class="oe_stat_button" icon="fa-wrench" type="object" name="action_show_expenses">
                             <div class="o_stat_info">
                                 <span class="o_stat_value">
@@ -78,6 +87,7 @@
                         </group>
                         <group>
                             <field name="start_date" readonly="state in ['running','closed']"/>
+                            <field name="payment_due_date" readonly="state == 'closed'"/>
                             <!--                            <field name="end_date"/>-->
                             <field name="advance_amount"/>
                             <field name="security_deposit"/>
@@ -91,7 +101,9 @@
                                     <field name="month"/>
                                     <field name="rent_amount" readonly="1" force_save="1"/>
                                     <field name="paid_amount" sum="Total"/>
-                                    <field name="pending_amount" sum="Total"/>
+                                    <field name="balance_amount" string="Balance / Additional" readonly="1" force_save="1"/>
+                                    <field name="pending_amount" string="Pending Amount" sum="Total" invisible="pending_amount &lt;= 0"/>
+                                    <button name="action_open_pending_payment_wizard" type="object" string="Add Payment" icon="fa-money" invisible="pending_amount &lt;= 0"/>
                                     <field name="payment_method"/>
                                     <field name="remarks"/>
                                 </list>
@@ -107,6 +119,36 @@
                                     <button name="action_open_payment_wizard" type="object" string="Pay" icon="fa-money"
                                             invisible="due_amount &lt;= 0"/>
                                 </list>
+                            </field>
+                        </page>
+                        <page string="Other Payments">
+                            <field name="other_payment_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="date"/>
+                                    <field name="payment_date"/>
+                                    <field name="is_paid" widget="boolean_toggle"/>
+                                    <field name="notes"/>
+                                </list>
+                                <form>
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="name"/>
+                                                <field name="amount"/>
+                                                <field name="date"/>
+                                            </group>
+                                            <group>
+                                                <field name="payment_date"/>
+                                                <field name="is_paid" widget="boolean_toggle"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <field name="notes"/>
+                                        </group>
+                                    </sheet>
+                                </form>
                             </field>
                         </page>
                         <page string="Occupants Info">
@@ -134,4 +176,64 @@
         <field name="res_model">kpm.villa.rent</field>
         <field name="view_mode">list,form</field>
     </record>
+
+    <record id="view_kpm_villa_other_payment_tree" model="ir.ui.view">
+        <field name="name">kpm.villa.other.payment.tree</field>
+        <field name="model">kpm.villa.other.payment</field>
+        <field name="arch" type="xml">
+            <list string="Other Payments">
+                <field name="rent_id"/>
+                <field name="name"/>
+                <field name="amount" sum="Total"/>
+                <field name="date"/>
+                <field name="payment_date"/>
+                <field name="is_paid" widget="boolean_toggle"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_kpm_villa_other_payment_form" model="ir.ui.view">
+        <field name="name">kpm.villa.other.payment.form</field>
+        <field name="model">kpm.villa.other.payment</field>
+        <field name="arch" type="xml">
+            <form string="Other Payment">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="rent_id"/>
+                            <field name="name"/>
+                            <field name="amount"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="payment_date"/>
+                            <field name="is_paid" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+<record id="view_kpm_villa_payment_pending_wizard_form" model="ir.ui.view">
+    <field name="name">kpm.villa.payment.pending.wizard.form</field>
+    <field name="model">kpm.villa.payment.pending.wizard</field>
+    <field name="arch" type="xml">
+        <form string="Pending Amount">
+            <group>
+                <field name="payment_id"/>
+                <field name="payment_amount"/>
+            </group>
+            <footer>
+                <button name="action_confirm_payment" string="Pay" type="object" class="btn-primary"/>
+                <button string="Cancel" special="cancel" class="btn-secondary"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
 </odoo>

@@ -356,6 +356,142 @@
         </t>
     </template>
 
+    <!-- Mobile Enquiries List -->
+    <template id="villa_mobile_enquiries" name="Enquiries List">
+        <t t-call="kpm_villa.villa_mobile_layout">
+            <div class="app-header d-flex align-items-center">
+                <a href="/villa/mobile/dashboard" class="text-white me-3"><i class="fa fa-chevron-left"/></a>
+                <h4 class="mb-0 fw-bold">Enquiries</h4>
+            </div>
+            <div class="container pb-5">
+                <form action="/villa/mobile/enquiries" method="get" class="mobile-card animate-up mb-3">
+                    <div class="input-group">
+                        <input type="search" name="q" class="form-control border-0 bg-light"
+                               placeholder="Search enquiries" t-att-value="search_term"/>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search"/>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="/villa/mobile/enquiry/new" class="btn btn-success rounded-pill px-4 fw-bold">
+                        <i class="fa fa-plus me-1"/> Add Enquiry
+                    </a>
+                </div>
+
+                <t t-foreach="enquiries" t-as="enquiry">
+                    <a t-att-href="'/villa/mobile/enquiry/%s' % enquiry.id"
+                       class="mobile-card animate-up d-block text-decoration-none text-reset">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center min-w-0">
+                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                                     style="width:56px;height:56px;">
+                                    <i class="fa fa-question-circle fa-lg"/>
+                                </div>
+                                <div class="min-w-0">
+                                    <h6 class="mb-1 fw-bold text-truncate"><t t-esc="enquiry.name"/></h6>
+                                    <p class="text-muted small mb-0 text-truncate">
+                                        <i class="fa fa-phone me-1"/>
+                                        <t t-esc="enquiry.phone"/>
+                                    </p>
+                                    <p class="text-muted smaller mb-0 text-truncate">
+                                        <i class="fa fa-map-marker me-1"/>
+                                        <t t-esc="enquiry.location or '-'"/>
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="fa fa-chevron-right text-muted ms-3"/>
+                        </div>
+                    </a>
+                </t>
+                <t t-if="not enquiries">
+                    <p class="text-center text-muted py-3 mb-0 small">No enquiries found.</p>
+                </t>
+            </div>
+            <a href="/villa/mobile/enquiry/new" class="fab">
+                <i class="fa fa-plus"/>
+            </a>
+        </t>
+    </template>
+
+    <!-- Mobile Enquiry Form -->
+    <template id="villa_mobile_enquiry_form" name="New Enquiry">
+        <t t-call="kpm_villa.villa_mobile_layout">
+            <div class="app-header d-flex align-items-center">
+                <a href="/villa/mobile/enquiries" class="text-white me-3"><i class="fa fa-chevron-left"/></a>
+                <h4 class="mb-0 fw-bold">Add Enquiry</h4>
+            </div>
+            <div class="container pb-5">
+                <div class="mobile-card animate-up">
+                    <form action="/villa/mobile/enquiry/save" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="mb-3">
+                            <label class="card-label">Name</label>
+                            <input type="text" name="name" class="form-control border-0 bg-light" required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="card-label">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control border-0 bg-light" required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="card-label">Location</label>
+                            <input type="text" name="location" class="form-control border-0 bg-light"/>
+                        </div>
+                        <div class="mb-4">
+                            <label class="card-label">Description</label>
+                            <textarea name="description" class="form-control border-0 bg-light" rows="4"
+                                      placeholder="Requirement, preferred room, budget, visit details..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-pill py-3 fw-bold border-0">
+                            Save Enquiry
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Mobile Enquiry Detail -->
+    <template id="villa_mobile_enquiry_detail" name="Enquiry Detail">
+        <t t-call="kpm_villa.villa_mobile_layout">
+            <div class="app-header d-flex align-items-center">
+                <a href="/villa/mobile/enquiries" class="text-white me-3"><i class="fa fa-chevron-left"/></a>
+                <h4 class="mb-0 fw-bold">Enquiry Details</h4>
+            </div>
+            <div class="container pb-5">
+                <div class="mobile-card animate-up text-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width:96px;height:96px;">
+                        <i class="fa fa-question-circle fa-2x"/>
+                    </div>
+                    <h5 class="fw-bold mb-1"><t t-esc="enquiry.name"/></h5>
+                    <p class="text-muted mb-0"><t t-esc="enquiry.location or 'No location set'"/></p>
+                </div>
+
+                <div class="mobile-card animate-up" style="animation-delay: 0.1s;">
+                    <h6 class="fw-bold mb-3 d-flex align-items-center">
+                        <i class="fa fa-address-card-o me-2 text-info"/> Enquiry Details
+                    </h6>
+                    <div class="list-item-mobile">
+                        <span class="text-muted">Phone</span>
+                        <span class="fw-bold"><t t-esc="enquiry.phone"/></span>
+                    </div>
+                    <div class="list-item-mobile">
+                        <span class="text-muted">Location</span>
+                        <span class="fw-bold text-end"><t t-esc="enquiry.location or '-'"/></span>
+                    </div>
+                    <div class="list-item-mobile align-items-start">
+                        <span class="text-muted">Description</span>
+                        <span class="fw-bold text-end text-break">
+                            <t t-esc="enquiry.description or '-'"/>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
     <!-- Mobile Agreements List -->
     <template id="villa_mobile_agreements" name="Agreements List">
         <t t-call="kpm_villa.villa_mobile_layout">

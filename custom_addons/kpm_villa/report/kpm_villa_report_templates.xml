@@ -39,12 +39,14 @@
                             <thead>
                                 <tr>
                                     <th>Total Paid</th>
-                                    <th>Pending Amount</th>
+                                    <th>Net Balance</th>
+                                    <th>Amount Due</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td><span t-field="o.total_paid"/></td>
+                                    <td><span t-field="o.advance_amount"/></td>
                                     <td><span t-field="o.pending_amount"/></td>
                                 </tr>
                             </tbody>

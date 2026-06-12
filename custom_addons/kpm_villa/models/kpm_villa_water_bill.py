@@ -4,14 +4,25 @@ from odoo.exceptions import ValidationError
 class KpmVillaWaterBill(models.Model):
     _name = 'kpm.villa.water.bill'
     _description = 'Water Bill Split'
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'kpm.whatsapp.mixin']
 
-    name = fields.Char(string='Bill Reference', required=True)
-    bill_date = fields.Date(string='Bill Date', required=True, default=fields.Date.context_today)
-    total_amount = fields.Float(string='Total Amount', required=True)
+    name = fields.Char(string='Bill Reference', required=True, tracking=True)
+    bill_date = fields.Date(string='Bill Date', required=True, default=fields.Date.context_today, tracking=True)
+    total_amount = fields.Float(string='Total Amount', required=True, tracking=True)
     split_method = fields.Selection([
         ('equal', 'Equal Split'),
         ('manual', 'Manual Split'),
-    ], string='Split Method', default='equal', required=True)
+    ], string='Split Method', default='equal', required=True, tracking=True)
+    month = fields.Selection([
+        ('01', 'January'), ('02', 'February'), ('03', 'March'), ('04', 'April'),
+        ('05', 'May'), ('06', 'June'), ('07', 'July'), ('08', 'August'),
+        ('09', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')
+    ], string='Month', required=True, tracking=True)
+    due_date = fields.Date(string='Due Date', required=True, default=fields.Date.context_today, tracking=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('validated', 'Validated'),
+    ], string='Status', default='draft', required=True, tracking=True)
     line_ids = fields.One2many('kpm.villa.water.bill.line', 'water_bill_id', string='Split Lines')
 
     def _prepare_equal_split_lines(self, raise_if_empty=False):
@@ -49,9 +60,41 @@ class KpmVillaWaterBill(models.Model):
             if round(sum(record.line_ids.mapped('amount')) - record.total_amount, 2) != 0:
                 raise ValidationError(_('Total split amount must equal total bill amount.'))
 
+    def action_validate(self):
+        for record in self:
+            if not record.line_ids:
+                raise ValidationError(_("Cannot validate a water bill with no split lines. Please split or add lines first."))
+            record._send_water_bill_notifications()
+            record.write({'state': 'validated'})
+
+    def _send_water_bill_notifications(self):
+        for record in self:
+            month_label = dict(self._fields['month'].selection).get(record.month, '')
+            due_date_str = record.due_date.strftime('%Y-%m-%d') if record.due_date else ''
+            for line in record.line_ids:
+                partner = line.rent_id.partner_id
+                if partner:
+                    message = _(
+                        "Hello %s, the water bill split for %s has been generated. Your share is %s, due on %s."
+                    ) % (partner.name, month_label, line.amount, due_date_str)
+                    line._send_whatsapp_message(partner, message)
+
+    def write(self, vals):
+        for record in self:
+            if record.state == 'validated' and any(k not in ['state'] for k in vals.keys()):
+                raise ValidationError(_("You cannot modify a validated water bill split."))
+        return super(KpmVillaWaterBill, self).write(vals)
+
+    def unlink(self):
+        for record in self:
+            if record.state == 'validated':
+                raise ValidationError(_("You cannot delete a validated water bill split."))
+        return super(KpmVillaWaterBill, self).unlink()
+
 class KpmVillaWaterBillLine(models.Model):
     _name = 'kpm.villa.water.bill.line'
     _description = 'Water Bill Line'
+    _inherit = ['kpm.whatsapp.mixin']
 
     water_bill_id = fields.Many2one('kpm.villa.water.bill', string='Water Bill', ondelete='cascade')
     villa_id = fields.Many2one('kpm.villa', string='Villa', required=True)

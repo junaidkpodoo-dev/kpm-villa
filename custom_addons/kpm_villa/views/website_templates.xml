@@ -27,6 +27,10 @@
                         <i class="fa fa-users"/>
                         <span>Customers</span>
                     </a>
+                    <a href="/villa/mobile/enquiries" class="nav-item-mobile">
+                        <i class="fa fa-question-circle"/>
+                        <span>Enquiry</span>
+                    </a>
                     <a href="/villa/mobile/water_bills" class="nav-item-mobile">
                         <i class="fa fa-tint"/>
                         <span>Water</span>
@@ -242,6 +246,13 @@
                                                t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
                                         </span>
                                     </div>
+                                    <div class="d-flex justify-content-between smaller">
+                                        <span class="text-muted">Other</span>
+                                        <span class="fw-bold villa-pending-value">
+                                            <t t-esc="stats['pending_other']"
+                                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </button>
@@ -252,7 +263,7 @@
                     <div class="section-title d-flex justify-content-between align-items-center mb-3 animate-up"
                          style="animation-delay: 0.15s;">
                         <h6 class="mb-0 fw-bold">Pending Details</h6>
-                        <span class="small text-muted">Rent &amp; water</span>
+                        <span class="small text-muted">Rent, water &amp; other</span>
                     </div>
 
                     <t t-if="pending_details">
@@ -359,6 +370,54 @@
                         </div>
                     </a>
                 </t>
+
+                <div class="section-title d-flex justify-content-between align-items-center mb-3 animate-up"
+                     style="animation-delay: 0.35s;">
+                    <h6 class="mb-0 fw-bold">Recent Enquiries</h6>
+                    <a href="/villa/mobile/enquiries" class="small villa-accent-link text-decoration-none fw-bold">
+                        View All
+                    </a>
+                </div>
+
+                <div class="mobile-card animate-up" style="animation-delay: 0.38s;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="card-label">Total Enquiries</span>
+                            <div class="card-value villa-stat-value">
+                                <t t-esc="stats['enquiry_count']"/>
+                            </div>
+                        </div>
+                        <a href="/villa/mobile/enquiry/new"
+                           class="btn rounded-circle d-flex align-items-center justify-content-center text-white"
+                           style="width:44px;height:44px;background:#8b642b;">
+                            <i class="fa fa-plus"/>
+                        </a>
+                    </div>
+                    <t t-if="enquiries">
+                        <t t-foreach="enquiries" t-as="enquiry">
+                            <a t-att-href="'/villa/mobile/enquiry/%s' % enquiry.id"
+                               class="d-flex justify-content-between align-items-center text-decoration-none text-reset py-3 border-top">
+                                <div class="min-w-0">
+                                    <h6 class="fw-bold mb-1 text-truncate">
+                                        <t t-esc="enquiry.name"/>
+                                    </h6>
+                                    <p class="small text-muted mb-0 text-truncate">
+                                        <i class="fa fa-phone me-1"/>
+                                        <t t-esc="enquiry.phone"/>
+                                        <t t-if="enquiry.location">
+                                            ·
+                                            <t t-esc="enquiry.location"/>
+                                        </t>
+                                    </p>
+                                </div>
+                                <i class="fa fa-chevron-right text-muted ms-3"/>
+                            </a>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <p class="text-center text-muted py-3 mb-0 small">No enquiries recorded.</p>
+                    </t>
+                </div>
             </div>
 
             <!-- Floating Action Button -->
@@ -445,6 +504,13 @@
                         </span>
                     </div>
                     <div class="list-item-mobile">
+                        <span class="text-muted">Net Balance</span>
+                        <span class="fw-bold text-info">
+                            <t t-esc="agreement.advance_amount"
+                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                        </span>
+                    </div>
+                    <div class="list-item-mobile">
                         <span class="text-muted">Total Paid</span>
                         <span class="fw-bold text-success">
                             <t t-esc="agreement.total_paid"
@@ -452,9 +518,23 @@
                         </span>
                     </div>
                     <div class="list-item-mobile">
-                        <span class="text-muted">Pending Amount</span>
+                        <span class="text-muted">Amount Due</span>
                         <span class="fw-bold text-danger">
                             <t t-esc="agreement.pending_amount"
+                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                        </span>
+                    </div>
+                    <div class="list-item-mobile">
+                        <span class="text-muted">Other Paid</span>
+                        <span class="fw-bold text-success">
+                            <t t-esc="agreement.other_payment_paid_total"
+                               t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                        </span>
+                    </div>
+                    <div class="list-item-mobile">
+                        <span class="text-muted">Other Due</span>
+                        <span class="fw-bold text-danger">
+                            <t t-esc="agreement.other_payment_due_total"
                                t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
                         </span>
                     </div>
@@ -547,21 +627,37 @@
                                     <!-- RIGHT -->
                                     <div class="text-end">
 
-                                        <!-- Due -->
-                                        <t t-if="pay.pending_amount > 0">
+                                        <!-- Balance / Due -->
+                                        <t t-if="pay.balance_amount > 0">
+                                            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill"
+                                                 style="
+                                background: linear-gradient(135deg,#e8fff1,#d9fbe8);
+                                color:#198754;
+                                font-size:12px;
+                                font-weight:700;
+                                box-shadow:0 2px 8px rgba(25,135,84,0.12);
+                             ">
 
-                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <i class="fa fa-plus-circle"/>
+
+                                                Additional:
+                                                <t t-esc="pay.balance_amount"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+
+                                            </div>
+                                        </t>
+                                        <t t-elif="pay.pending_amount > 0">
+
+                                            <div class="d-flex align-items-center justify-content-end gap-2 flex-wrap">
 
                                                 <span class="smaller fw-bold text-danger">
-                                                    Due:
+                                                    Pending Amount:
                                                     <t t-esc="pay.pending_amount"
                                                        t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
                                                 </span>
 
-                                                <!-- Add Button -->
                                                 <button type="button"
-                                                        class="btn btn-success btn-sm rounded-circle d-flex align-items-center justify-content-center btn-add-due-payment"
-                                                        style="width:32px;height:32px;"
+                                                        class="btn btn-warning btn-sm rounded-pill d-inline-flex align-items-center justify-content-center gap-1 btn-add-pending-payment"
                                                         t-att-data-payment-id="pay.id"
                                                         t-att-data-payment-month="pay.month"
                                                         t-att-data-payment-rent="pay.rent_amount"
@@ -569,14 +665,14 @@
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#addPaymentModal">
 
-                                                    <i class="fa fa-plus"/>
+                                                    <i class="fa fa-money"/>
+                                                    Pending Amount
 
                                                 </button>
 
                                             </div>
 
                                         </t>
-
                                         <!-- Fully Paid -->
                                         <t t-else="">
                                             <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill"
@@ -617,7 +713,7 @@
                         <button type="button"
                                 class="btn btn-success w-100 rounded-pill py-3 fw-bold border-0 btn-add-new-payment"
                                 t-att-data-payment-month="current_month"
-                                t-att-data-payment-rent="agreement.monthly_rent"
+                                t-att-data-payment-rent="agreement._get_effective_monthly_rent()"
                                 data-bs-toggle="modal"
                                 data-bs-target="#addPaymentModal">
 
@@ -628,6 +724,78 @@
 
                     </div>
 
+                </div>
+
+                <!-- Other Payments -->
+                <div class="mobile-card animate-up" style="animation-delay: 0.25s;">
+                    <h6 class="fw-bold mb-3 d-flex align-items-center">
+                        <i class="fa fa-plus-circle me-2 text-warning"/>
+                        Other Payments
+                    </h6>
+                    <t t-if="agreement.other_payment_ids">
+                        <t t-foreach="agreement.other_payment_ids" t-as="other">
+                            <div class="py-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div class="pe-2">
+                                        <div class="d-flex flex-column">
+                                            <span class="small fw-bold text-dark">
+                                                <t t-esc="other.name"/>
+                                            </span>
+                                            <span class="small fw-bold text-dark">
+                                                Amount:
+                                                <t t-esc="other.amount"
+                                                   t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </span>
+                                            <span class="text-muted smaller">
+                                                Date:
+                                                <t t-esc="other.date"/>
+                                            </span>
+                                            <t t-if="other.payment_date">
+                                                <span class="text-muted smaller">
+                                                    Paid On:
+                                                    <t t-esc="other.payment_date"/>
+                                                </span>
+                                            </t>
+                                            <t t-if="other.notes">
+                                                <span class="text-muted smaller">
+                                                    <t t-esc="other.notes"/>
+                                                </span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <t t-if="other.is_paid">
+                                            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill"
+                                                 style="background: linear-gradient(135deg,#e8fff1,#d9fbe8); color:#198754; font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(25,135,84,0.12);">
+                                                <i class="fa fa-check-circle"/>
+                                                Paid
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill"
+                                                 style="background: linear-gradient(135deg,#fff4e5,#ffe8c2); color:#b45309; font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(180,83,9,0.12);">
+                                                <i class="fa fa-clock-o"/>
+                                                Not Paid
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <p class="text-center text-muted py-3 mb-0 small">No other payments recorded.</p>
+                    </t>
+
+                    <div class="pt-3 mt-3 border-top">
+                        <button type="button"
+                                class="btn btn-warning w-100 rounded-pill py-3 fw-bold border-0 text-white"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addOtherPaymentModal">
+                            <i class="fa fa-plus-circle me-1"/>
+                            Add Other Payment
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Water Bills -->
@@ -743,6 +911,78 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="addOtherPaymentModal" tabindex="-1" aria-labelledby="addOtherPaymentModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0">
+                        <form t-att-action="'/villa/mobile/agreement/%s/other/payment/save' % agreement.id"
+                              method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold" id="addOtherPaymentModalLabel">Add Other Payment</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="card-label">Name</label>
+                                    <input type="text" name="name" class="form-control border-0 bg-light"
+                                           placeholder="Cleaning, maintenance, fine..." required="required"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="card-label">Amount</label>
+                                    <input type="number" name="amount" class="form-control border-0 bg-light"
+                                           step="0.01" min="0" required="required"/>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="card-label">Date</label>
+                                            <input type="date" name="date" class="form-control border-0 bg-light"
+                                                   t-att-value="today" required="required"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="card-label">Payment Date</label>
+                                            <input type="date" name="payment_date"
+                                                   class="form-control border-0 bg-light"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="card-label d-block">Payment Status</label>
+                                    <div class="btn-group w-100" role="group" aria-label="Payment Status">
+                                        <input type="radio" class="btn-check" name="is_paid" id="other_not_paid"
+                                               value="not_paid" checked="checked"/>
+                                        <label class="btn btn-outline-danger rounded-start-pill" for="other_not_paid">
+                                            Not Paid
+                                        </label>
+                                        <input type="radio" class="btn-check" name="is_paid" id="other_paid"
+                                               value="paid"/>
+                                        <label class="btn btn-outline-success rounded-end-pill" for="other_paid">
+                                            Paid
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="card-label">Additional Note</label>
+                                    <textarea name="notes" class="form-control border-0 bg-light" rows="3"
+                                              placeholder="Optional note"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold text-white">
+                                    Save Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="addWaterPaymentModal" tabindex="-1" aria-labelledby="addWaterPaymentModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-sm mx-3 mx-sm-auto">
@@ -836,10 +1076,15 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="card-label">Rent Amount</label>
+                                    <label class="card-label">Amount Due</label>
                                     <input type="number" name="rent_amount" class="form-control border-0 bg-light"
-                                           t-att-value="agreement.monthly_rent" step="0.01" min="0"
+                                           t-att-value="agreement._get_effective_monthly_rent()" step="0.01" min="0"
                                            required="required"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="card-label">Net Balance</label>
+                                    <input type="number" class="form-control border-0 bg-light"
+                                           t-att-value="agreement.advance_amount" step="0.01" readonly="readonly"/>
                                 </div>
                                 <div class="mb-3">
                                     <label class="card-label" id="paid_amount_label">Paid Amount</label>

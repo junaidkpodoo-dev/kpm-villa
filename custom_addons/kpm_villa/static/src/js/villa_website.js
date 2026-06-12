@@ -6,12 +6,12 @@ publicWidget.registry.VillaMobileApp = publicWidget.Widget.extend({
     selector: ".o_villa_app",
     events: {
         "click .btn-delete-agreement": "_onDeleteAgreement",
-        "click .btn-add-due-payment": "_onAddDuePayment",
+        "click .btn-add-pending-payment": "_onAddPendingPayment",
         "click .btn-add-new-payment": "_onAddNewPayment",
         "click .btn-add-water-payment": "_onAddWaterPayment",
     },
 
-    _onAddDuePayment: function (ev) {
+    _onAddPendingPayment: function (ev) {
         const button = ev.currentTarget;
         const modal = document.querySelector("#addPaymentModal");
         if (!modal) return;
@@ -21,8 +21,8 @@ publicWidget.registry.VillaMobileApp = publicWidget.Widget.extend({
         modal.querySelector("input[name='rent_amount']").value = button.dataset.paymentRent || "";
         modal.querySelector("#paid_amount").value = "";
         modal.querySelector("#paid_amount").max = button.dataset.paymentDue || "";
-        modal.querySelector("#paid_amount_label").textContent = "Pay Due Amount";
-        modal.querySelector("#addPaymentModalLabel").textContent = "Add Due Payment";
+        modal.querySelector("#paid_amount_label").textContent = "Pending Amount";
+        modal.querySelector("#addPaymentModalLabel").textContent = "Pending Amount";
     },
 
     _onAddNewPayment: function (ev) {

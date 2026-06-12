@@ -14,9 +14,10 @@ class KpmVillaRent(models.Model):
     start_date = fields.Date(string='Start Date', required=True, default=fields.Date.context_today)
     end_date = fields.Date(string='End Date')
     monthly_rent = fields.Float(string='Monthly Rent', required=True, tracking=True)
-    advance_amount = fields.Float(string='Advance Amount')
+    advance_amount = fields.Float(string='Advance / Balance', default=0.0)
     security_deposit = fields.Float(string='Security Deposit')
     notes = fields.Text(string='Notes')
+    payment_due_date = fields.Date(string='Payment Due Date', tracking=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('running', 'Running'),
@@ -25,11 +26,15 @@ class KpmVillaRent(models.Model):
 
     payment_line_ids = fields.One2many('kpm.villa.payment', 'rent_id', string='Payments')
     water_bill_line_ids = fields.One2many('kpm.villa.water.bill.line', 'rent_id', string='Water Bills')
+    other_payment_ids = fields.One2many('kpm.villa.other.payment', 'rent_id', string='Other Payments')
     expense_ids = fields.One2many('kpm.villa.expense', 'villa_id', string='Expenses', compute='_compute_expenses')
 
     total_paid = fields.Float(compute='_compute_totals', string='Total Paid')
     pending_amount = fields.Float(compute='_compute_totals', string='Pending Amount')
     water_bill_total = fields.Float(compute='_compute_totals', string='Water Bill Total')
+    other_payment_total = fields.Float(compute='_compute_totals', string='Other Payment Total')
+    other_payment_paid_total = fields.Float(compute='_compute_totals', string='Other Payment Paid')
+    other_payment_due_total = fields.Float(compute='_compute_totals', string='Other Payment Due')
     expense_total = fields.Float(compute='_compute_totals', string='Expense Total')
     contact_nos = fields.Char("Mobile Number", related='partner_id.mobile', readonly=False)
     person_ids = fields.One2many(
@@ -44,6 +49,12 @@ class KpmVillaRent(models.Model):
             if vals.get('name', _('New')) == _('New'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('kpm.villa.rent') or _('New')
         return super().create(vals_list)
+
+    def _get_effective_monthly_rent(self):
+        self.ensure_one()
+        monthly_rent = self.monthly_rent or 0.0
+        advance_balance = max(self.advance_amount or 0.0, 0.0)
+        return max(monthly_rent - min(advance_balance, monthly_rent), 0.0)
 
     @api.constrains('villa_id', 'state')
     def _check_active_agreement(self):
@@ -77,9 +88,17 @@ class KpmVillaRent(models.Model):
     def _compute_totals(self):
         for record in self:
             record.total_paid = sum(record.payment_line_ids.mapped('paid_amount'))
-            record.pending_amount = sum(record.payment_line_ids.mapped('pending_amount'))
+            record.pending_amount = max(-(record.advance_amount or 0.0), 0.0)
             record.water_bill_total = sum(record.water_bill_line_ids.mapped('amount'))
+            record.other_payment_total = sum(record.other_payment_ids.mapped('amount'))
+            record.other_payment_paid_total = sum(record.other_payment_ids.filtered('is_paid').mapped('amount'))
+            record.other_payment_due_total = sum(record.other_payment_ids.filtered(lambda payment: not payment.is_paid).mapped('amount'))
             record.expense_total = sum(record.expense_ids.mapped('amount'))
+
+    @api.model
+    def action_send_daily_rent_reminders(self):
+        """Cron hook kept for compatibility; WhatsApp rent reminders are disabled."""
+        return True
 
     def action_show_payments(self):
         self.ensure_one()
@@ -113,6 +132,17 @@ class KpmVillaRent(models.Model):
             'domain': [('rent_id', '=', self.id)],
         }
 
+    def action_show_other_payments(self):
+        self.ensure_one()
+        return {
+            'name': 'Other Payments',
+            'type': 'ir.actions.act_window',
+            'res_model': 'kpm.villa.other.payment',
+            'view_mode': 'list,form',
+            'domain': [('rent_id', '=', self.id)],
+            'context': {'default_rent_id': self.id},
+        }
+
     def action_show_expenses(self):
         self.ensure_one()
         return {
@@ -143,3 +173,17 @@ class KpmVillaRentPerson(models.Model):
         'attachment_id',
         string='Documents'
     )
+
+
+class KpmVillaOtherPayment(models.Model):
+    _name = 'kpm.villa.other.payment'
+    _description = 'Villa Other Payment'
+    _order = 'date desc, id desc'
+
+    rent_id = fields.Many2one('kpm.villa.rent', string='Rent Agreement', ondelete='cascade', required=True)
+    name = fields.Char(string='Name', required=True)
+    amount = fields.Float(string='Amount', required=True)
+    date = fields.Date(string='Date', default=fields.Date.context_today, required=True)
+    payment_date = fields.Date(string='Payment Date')
+    is_paid = fields.Boolean(string='Paid')
+    notes = fields.Text(string='Additional Note')

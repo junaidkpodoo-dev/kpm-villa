@@ -19,24 +19,28 @@
         <field name="arch" type="xml">
             <form string="Water Bill Split">
                 <header>
-                    <button name="action_split_bill" string="Split" type="object" class="btn-primary" invisible="split_method != 'equal'"/>
+                    <button name="action_split_bill" string="Split" type="object" class="btn-primary" invisible="split_method != 'equal' or state == 'validated'"/>
+                    <button name="action_validate" string="Validate" type="object" class="btn-primary" invisible="state == 'validated'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,validated"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
-                        <h1><field name="name" placeholder="Bill Reference"/></h1>
+                        <h1><field name="name" placeholder="Bill Reference" readonly="state == 'validated'"/></h1>
                     </div>
                     <group>
                         <group>
-                            <field name="bill_date"/>
-                            <field name="split_method"/>
+                            <field name="bill_date" readonly="state == 'validated'"/>
+                            <field name="split_method" readonly="state == 'validated'"/>
+                            <field name="month" readonly="state == 'validated'"/>
                         </group>
                         <group>
-                            <field name="total_amount"/>
+                            <field name="total_amount" readonly="state == 'validated'"/>
+                            <field name="due_date" readonly="state == 'validated'"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Split Lines">
-                            <field name="line_ids">
+                            <field name="line_ids" readonly="state == 'validated'">
                                 <list editable="bottom">
                                     <field name="villa_id"/>
                                     <field name="rent_id"/>
@@ -49,6 +53,7 @@
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

@@ -21,10 +21,12 @@ KPM Villa Management System
     'data': [
         'security/ir.model.access.csv',
         'data/sequences.xml',
+        'data/ir_cron_data.xml',
         'views/kpm_villa_views.xml',
         'views/kpm_villa_rent_views.xml',
         'views/kpm_villa_water_bill_views.xml',
         'views/kpm_villa_expense_views.xml',
+        'views/kpm_villa_enquiry_views.xml',
         'views/kpm_villa_dashboard_views.xml',
         'views/kpm_villa_menu.xml',
         'report/kpm_villa_reports.xml',

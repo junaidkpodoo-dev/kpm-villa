@@ -9,47 +9,57 @@ class VillaWebsite(http.Controller):
         payments = request.env['kpm.villa.payment'].search([])
         expenses = request.env['kpm.villa.expense'].search([])
         agreements = request.env['kpm.villa.rent'].search([('state', '=', 'running')])
+        enquiries = request.env['kpm.villa.enquiry'].search([])
         
         total_revenue = sum(payments.mapped('paid_amount'))
-        # Total pending = Rent pending + Water bill pending
-        pending_rent = sum(payments.mapped('pending_amount'))
+        # Total pending = current rent due + water bill pending + other pending
+        pending_rent = sum(agreements.mapped('pending_amount'))
         pending_water = sum(request.env['kpm.villa.water.bill.line'].search([]).mapped('due_amount'))
-        pending_amount = pending_rent + pending_water
+        pending_other = sum(request.env['kpm.villa.other.payment'].search([('is_paid', '=', False)]).mapped('amount'))
+        pending_amount = pending_rent + pending_water + pending_other
         
         total_expenses = sum(expenses.mapped('amount'))
+        other_paid = sum(request.env['kpm.villa.other.payment'].search([('is_paid', '=', True)]).mapped('amount'))
         
         return {
-            'total_revenue': total_revenue,
+            'total_revenue': total_revenue + other_paid,
             'pending_amount': pending_amount,
             'pending_rent': pending_rent,
             'pending_water': pending_water,
+            'pending_other': pending_other,
             'total_expenses': total_expenses,
-            'net_profit': total_revenue - total_expenses,
+            'net_profit': total_revenue + other_paid - total_expenses,
             'occupied_villas': len(villas.filtered(lambda v: v.status == 'occupied')),
             'available_villas': len(villas.filtered(lambda v: v.status == 'available')),
             'active_agreements_count': len(agreements),
+            'enquiry_count': len(enquiries),
         }
 
     @http.route('/villa/mobile/dashboard', type='http', auth='user', website=True)
     def mobile_dashboard(self, **kwargs):
         stats = self._get_dashboard_stats()
         agreements = request.env['kpm.villa.rent'].search([], limit=5, order='create_date desc')
-        pending_rent_lines = request.env['kpm.villa.payment'].search([
-            ('pending_amount', '>', 0)
-        ], limit=8, order='payment_date desc, id desc')
+        enquiries = request.env['kpm.villa.enquiry'].search([], limit=5, order='create_date desc')
+        pending_rent_agreements = request.env['kpm.villa.rent'].search([
+            ('state', '=', 'running'),
+            ('pending_amount', '>', 0),
+        ], limit=8, order='payment_due_date desc, id desc')
         pending_water_lines = request.env['kpm.villa.water.bill.line'].search([
             ('due_amount', '>', 0)
         ], limit=8, order='id desc')
+        pending_other_lines = request.env['kpm.villa.other.payment'].search([
+            ('is_paid', '=', False)
+        ], limit=8, order='date desc, id desc')
         pending_details = []
 
-        for payment in pending_rent_lines:
+        for agreement in pending_rent_agreements:
             pending_details.append({
-                'partner_name': payment.rent_id.partner_id.name,
-                'villa_name': payment.rent_id.villa_id.name,
+                'partner_name': agreement.partner_id.name,
+                'villa_name': agreement.villa_id.name,
                 'type': 'Rent',
-                'amount': payment.pending_amount,
-                'date': payment.payment_date,
-                'href': '/villa/mobile/agreement/%s' % payment.rent_id.id,
+                'amount': agreement.pending_amount,
+                'date': agreement.payment_due_date or (agreement.create_date.date() if agreement.create_date else None),
+                'href': '/villa/mobile/agreement/%s' % agreement.id,
             })
 
         for water_line in pending_water_lines:
@@ -62,6 +72,16 @@ class VillaWebsite(http.Controller):
                 'href': '/villa/mobile/agreement/%s' % water_line.rent_id.id,
             })
 
+        for other_payment in pending_other_lines:
+            pending_details.append({
+                'partner_name': other_payment.rent_id.partner_id.name,
+                'villa_name': other_payment.rent_id.villa_id.name,
+                'type': 'Other',
+                'amount': other_payment.amount,
+                'date': other_payment.date,
+                'href': '/villa/mobile/agreement/%s' % other_payment.rent_id.id,
+            })
+
         pending_details = sorted(
             pending_details,
             key=lambda line: line['date'] or datetime.date.min,
@@ -70,7 +90,51 @@ class VillaWebsite(http.Controller):
         return request.render("kpm_villa.villa_mobile_dashboard", {
             'stats': stats,
             'agreements': agreements,
+            'enquiries': enquiries,
             'pending_details': pending_details,
+        })
+
+    # --- Enquiries ---
+
+    @http.route('/villa/mobile/enquiries', type='http', auth='user', website=True)
+    def mobile_enquiries(self, **kwargs):
+        search_term = (kwargs.get('q') or '').strip()
+        domain = []
+        if search_term:
+            domain = [
+                '|', '|', '|',
+                ('name', 'ilike', search_term),
+                ('phone', 'ilike', search_term),
+                ('location', 'ilike', search_term),
+                ('description', 'ilike', search_term),
+            ]
+        enquiries = request.env['kpm.villa.enquiry'].search(domain, order='create_date desc')
+        return request.render("kpm_villa.villa_mobile_enquiries", {
+            'enquiries': enquiries,
+            'search_term': search_term,
+        })
+
+    @http.route('/villa/mobile/enquiry/new', type='http', auth='user', website=True)
+    def mobile_enquiry_new(self, **kwargs):
+        return request.render("kpm_villa.villa_mobile_enquiry_form", {})
+
+    @http.route('/villa/mobile/enquiry/save', type='http', auth='user', methods=['POST'], website=True)
+    def mobile_enquiry_save(self, **post):
+        enquiry = request.env['kpm.villa.enquiry'].create({
+            'name': post.get('name'),
+            'phone': post.get('phone'),
+            'location': post.get('location'),
+            'description': post.get('description'),
+        })
+        return request.redirect('/villa/mobile/enquiry/%s' % enquiry.id)
+
+    @http.route('/villa/mobile/enquiry/<int:enquiry_id>', type='http', auth='user', website=True)
+    def mobile_enquiry_detail(self, enquiry_id, **kwargs):
+        enquiry = request.env['kpm.villa.enquiry'].browse(enquiry_id)
+        if not enquiry.exists():
+            return request.redirect('/villa/mobile/enquiries')
+        return request.render("kpm_villa.villa_mobile_enquiry_detail", {
+            'enquiry': enquiry,
         })
 
     # --- Rooms ---
@@ -232,13 +296,15 @@ class VillaWebsite(http.Controller):
                 ('rent_id', '=', agreement.id),
             ], limit=1)
             if payment.exists() and paid_amount > 0:
-                amount_to_add = min(paid_amount, payment.pending_amount)
-                payment.write({
-                    'payment_date': post.get('payment_date') or datetime.date.today(),
-                    'paid_amount': payment.paid_amount + amount_to_add,
-                    'payment_method': post.get('payment_method') or payment.payment_method,
-                    'remarks': post.get('remarks') or payment.remarks,
-                })
+                pending_amount = payment.pending_amount or 0.0
+                paid_amount = min(paid_amount, pending_amount)
+                if paid_amount > 0:
+                    payment.write({
+                        'payment_date': post.get('payment_date') or datetime.date.today(),
+                        'paid_amount': payment.paid_amount + paid_amount,
+                        'payment_method': post.get('payment_method') or payment.payment_method,
+                        'remarks': post.get('remarks') or payment.remarks,
+                    })
             return request.redirect('/villa/mobile/agreement/%s' % agreement.id)
 
         request.env['kpm.villa.payment'].create({
@@ -271,6 +337,24 @@ class VillaWebsite(http.Controller):
             amount_to_add = min(payment_amount, water_line.due_amount)
             water_line.paid_amount += amount_to_add
 
+        return request.redirect('/villa/mobile/agreement/%s' % agreement.id)
+
+    @http.route('/villa/mobile/agreement/<int:agreement_id>/other/payment/save', type='http', auth='user', methods=['POST'], website=True)
+    def mobile_other_payment_save(self, agreement_id, **post):
+        agreement = request.env['kpm.villa.rent'].browse(agreement_id)
+        if not agreement.exists():
+            return request.redirect('/villa/mobile/dashboard')
+
+        is_paid = post.get('is_paid') == 'paid'
+        request.env['kpm.villa.other.payment'].create({
+            'rent_id': agreement.id,
+            'name': post.get('name'),
+            'amount': float(post.get('amount') or 0),
+            'date': post.get('date') or datetime.date.today(),
+            'payment_date': post.get('payment_date') or (datetime.date.today() if is_paid else False),
+            'is_paid': is_paid,
+            'notes': post.get('notes'),
+        })
         return request.redirect('/villa/mobile/agreement/%s' % agreement.id)
 
     @http.route('/villa/mobile/agreement/delete/<int:agreement_id>', type='http', auth='user', website=True)
@@ -407,4 +491,3 @@ class VillaWebsite(http.Controller):
             line.paid_amount += min(payment_amount, line.due_amount)
             
         return request.redirect('/villa/mobile/water_bill/%s' % line.water_bill_id.id)
-
