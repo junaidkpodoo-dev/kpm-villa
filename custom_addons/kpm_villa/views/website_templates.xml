@@ -371,59 +371,59 @@
                     </a>
                 </t>
 
-                <div class="section-title d-flex justify-content-between align-items-center mb-3 animate-up"
-                     style="animation-delay: 0.35s;">
-                    <h6 class="mb-0 fw-bold">Recent Enquiries</h6>
-                    <a href="/villa/mobile/enquiries" class="small villa-accent-link text-decoration-none fw-bold">
-                        View All
-                    </a>
-                </div>
+<!--                <div class="section-title d-flex justify-content-between align-items-center mb-3 animate-up"-->
+<!--                     style="animation-delay: 0.35s;">-->
+<!--                    <h6 class="mb-0 fw-bold">Recent Enquiries</h6>-->
+<!--                    <a href="/villa/mobile/enquiries" class="small villa-accent-link text-decoration-none fw-bold">-->
+<!--                        View All-->
+<!--                    </a>-->
+<!--                </div>-->
 
-                <div class="mobile-card animate-up" style="animation-delay: 0.38s;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <span class="card-label">Total Enquiries</span>
-                            <div class="card-value villa-stat-value">
-                                <t t-esc="stats['enquiry_count']"/>
-                            </div>
-                        </div>
-                        <a href="/villa/mobile/enquiry/new"
-                           class="btn rounded-circle d-flex align-items-center justify-content-center text-white"
-                           style="width:44px;height:44px;background:#8b642b;">
-                            <i class="fa fa-plus"/>
-                        </a>
-                    </div>
-                    <t t-if="enquiries">
-                        <t t-foreach="enquiries" t-as="enquiry">
-                            <a t-att-href="'/villa/mobile/enquiry/%s' % enquiry.id"
-                               class="d-flex justify-content-between align-items-center text-decoration-none text-reset py-3 border-top">
-                                <div class="min-w-0">
-                                    <h6 class="fw-bold mb-1 text-truncate">
-                                        <t t-esc="enquiry.name"/>
-                                    </h6>
-                                    <p class="small text-muted mb-0 text-truncate">
-                                        <i class="fa fa-phone me-1"/>
-                                        <t t-esc="enquiry.phone"/>
-                                        <t t-if="enquiry.location">
-                                            ·
-                                            <t t-esc="enquiry.location"/>
-                                        </t>
-                                    </p>
-                                </div>
-                                <i class="fa fa-chevron-right text-muted ms-3"/>
-                            </a>
-                        </t>
-                    </t>
-                    <t t-else="">
-                        <p class="text-center text-muted py-3 mb-0 small">No enquiries recorded.</p>
-                    </t>
-                </div>
+<!--                <div class="mobile-card animate-up" style="animation-delay: 0.38s;">-->
+<!--                    <div class="d-flex justify-content-between align-items-center mb-3">-->
+<!--                        <div>-->
+<!--                            <span class="card-label">Total Enquiries</span>-->
+<!--                            <div class="card-value villa-stat-value">-->
+<!--                                <t t-esc="stats['enquiry_count']"/>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <a href="/villa/mobile/enquiry/new"-->
+<!--                           class="btn rounded-circle d-flex align-items-center justify-content-center text-white"-->
+<!--                           style="width:44px;height:44px;background:#8b642b;">-->
+<!--                            <i class="fa fa-plus"/>-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                    <t t-if="enquiries">-->
+<!--                        <t t-foreach="enquiries" t-as="enquiry">-->
+<!--                            <a t-att-href="'/villa/mobile/enquiry/%s' % enquiry.id"-->
+<!--                               class="d-flex justify-content-between align-items-center text-decoration-none text-reset py-3 border-top">-->
+<!--                                <div class="min-w-0">-->
+<!--                                    <h6 class="fw-bold mb-1 text-truncate">-->
+<!--                                        <t t-esc="enquiry.name"/>-->
+<!--                                    </h6>-->
+<!--                                    <p class="small text-muted mb-0 text-truncate">-->
+<!--                                        <i class="fa fa-phone me-1"/>-->
+<!--                                        <t t-esc="enquiry.phone"/>-->
+<!--                                        <t t-if="enquiry.location">-->
+<!--                                            ·-->
+<!--                                            <t t-esc="enquiry.location"/>-->
+<!--                                        </t>-->
+<!--                                    </p>-->
+<!--                                </div>-->
+<!--                                <i class="fa fa-chevron-right text-muted ms-3"/>-->
+<!--                            </a>-->
+<!--                        </t>-->
+<!--                    </t>-->
+<!--                    <t t-else="">-->
+<!--                        <p class="text-center text-muted py-3 mb-0 small">No enquiries recorded.</p>-->
+<!--                    </t>-->
+<!--                </div>-->
             </div>
 
             <!-- Floating Action Button -->
-            <a href="/villa/mobile/agreement/new" class="fab">
-                <i class="fa fa-plus"/>
-            </a>
+<!--            <a href="/villa/mobile/agreement/new" class="fab">-->
+<!--                <i class="fa fa-plus"/>-->
+<!--            </a>-->
         </t>
     </template>
 
